@@ -1,60 +1,30 @@
-<!DOCTYPE html>
-<html lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <title>شات ذكاء اصطناعي بسيط</title>
-    <style>
-        body { font-family: Arial; background: #f0f0f0; display: flex; justify-content: center; align-items: center; height: 100vh; }
-        #chat-box { width: 400px; height: 500px; border: 1px solid #ccc; background: white; overflow-y: auto; padding: 10px; }
-        #user-input { width: 300px; padding: 10px; }
-        #send-btn { padding: 10px; }
-        .msg { margin: 5px 0; }
-        .bot { color: green; }
-        .user { color: blue; text-align: right; }
-    </style>
-</head>
-<body>
-    <div>
-        <h2>شات ذكاء اصطناعي وهمي</h2>
-        <div id="chat-box"></div>
-        <input type="text" id="user-input" placeholder="اكتب رسالتك...">
-        <button id="send-btn">إرسال</button>
-    </div>
+function chatbot(input) {
+  const text = input.toLowerCase();
 
-    <script>
-        const chatBox = document.getElementById('chat-box');
-        const userInput = document.getElementById('user-input');
-        const sendBtn = document.getElementById('send-btn');
+  if (text.includes("مرحبا") || text.includes("أهلا")) {
+    return "مرحبًا! كيف يمكنني مساعدتك اليوم؟";
+  }
+  if (text.includes("كيف حالك")) {
+    return "أنا بخير، شكرًا لسؤالك! كيف يمكنني مساعدتك؟";
+  }
+  if (text.includes("ساعدني") || text.includes("مساعدة")) {
+    return "بالطبع! أخبرني ماذا تريد أن تعرف أو تحتاج.";
+  }
+  if (text.includes("من أنت")) {
+    return "أنا شات بوت بسيط، هنا لأساعدك في أي سؤال.";
+  }
+  if (text.includes("شكراً") || text.includes("شكرًا")) {
+    return "على الرحب والسعة!";
+  }
 
-        function addMessage(text, sender) {
-            const msg = document.createElement('div');
-            msg.className = 'msg ' + sender;
-            msg.innerText = text;
-            chatBox.appendChild(msg);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+  // لو ما عرف يرد، يعطي رد عام
+  return "لم أفهم سؤالك جيدًا، هل يمكنك توضيح أكثر؟";
+}
 
-        function botReply(userMsg) {
-            const replies = [
-                "أنا هنا لمساعدتك!",
-                "ممكن توضح سؤالك؟",
-                "أنا ذكي جدًا 🤖",
-                "جميل كلامك، استمر!",
-                "لا تقلق، كل شيء تمام!"
-            ];
-            const reply = replies[Math.floor(Math.random() * replies.length)];
-            addMessage(reply, 'bot');
-        }
-
-        sendBtn.onclick = () => {
-            const msg = userInput.value.trim();
-            if (msg) {
-                addMessage(msg, 'user');
-                userInput.value = '';
-                setTimeout(() => botReply(msg), 500);
-            }
-        };
-    </script>
-</body>
-</html>
-
+// مثال تجربة:
+console.log(chatbot("مرحبا"));  // مرحبًا! كيف يمكنني مساعدتك اليوم؟
+console.log(chatbot("كيف حالك؟"));  // أنا بخير، شكرًا لسؤالك! كيف يمكنني مساعدتك؟
+console.log(chatbot("ساعدني"));  // بالطبع! أخبرني ماذا تريد أن تعرف أو تحتاج.
+console.log(chatbot("من أنت؟"));  // أنا شات بوت بسيط، هنا لأساعدك في أي سؤال.
+console.log(chatbot("شكراً جزيلاً"));  // على الرحب والسعة!
+console.log(chatbot("ماذا تفعل؟"));  // لم أفهم سؤالك جيدًا، هل يمكنك توضيح أكثر؟
