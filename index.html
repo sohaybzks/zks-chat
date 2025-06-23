@@ -1,30 +1,86 @@
-function chatbot(input) {
-  const text = input.toLowerCase();
+<?php
+session_start();
 
-  if (text.includes("مرحبا") || text.includes("أهلا")) {
-    return "مرحبًا! كيف يمكنني مساعدتك اليوم؟";
-  }
-  if (text.includes("كيف حالك")) {
-    return "أنا بخير، شكرًا لسؤالك! كيف يمكنني مساعدتك؟";
-  }
-  if (text.includes("ساعدني") || text.includes("مساعدة")) {
-    return "بالطبع! أخبرني ماذا تريد أن تعرف أو تحتاج.";
-  }
-  if (text.includes("من أنت")) {
-    return "أنا شات بوت بسيط، هنا لأساعدك في أي سؤال.";
-  }
-  if (text.includes("شكراً") || text.includes("شكرًا")) {
-    return "على الرحب والسعة!";
-  }
+$correct_password = 'sohayb';
+$storage_file = 'hidden_data.txt';
 
-  // لو ما عرف يرد، يعطي رد عام
-  return "لم أفهم سؤالك جيدًا، هل يمكنك توضيح أكثر؟";
+// معالجة إرسال رسالة
+if (isset($_POST['message']) && trim($_POST['message']) !== '') {
+    $msg = strip_tags($_POST['message']);
+    file_put_contents($storage_file, $msg . PHP_EOL, FILE_APPEND);
+    $status = "تم إرسال الرسالة.";
 }
 
-// مثال تجربة:
-console.log(chatbot("مرحبا"));  // مرحبًا! كيف يمكنني مساعدتك اليوم؟
-console.log(chatbot("كيف حالك؟"));  // أنا بخير، شكرًا لسؤالك! كيف يمكنني مساعدتك؟
-console.log(chatbot("ساعدني"));  // بالطبع! أخبرني ماذا تريد أن تعرف أو تحتاج.
-console.log(chatbot("من أنت؟"));  // أنا شات بوت بسيط، هنا لأساعدك في أي سؤال.
-console.log(chatbot("شكراً جزيلاً"));  // على الرحب والسعة!
-console.log(chatbot("ماذا تفعل؟"));  // لم أفهم سؤالك جيدًا، هل يمكنك توضيح أكثر؟
+// معالجة الدخول للخزنة
+if (isset($_POST['vault_password'])) {
+    if ($_POST['vault_password'] === $correct_password) {
+        $_SESSION['vault_access'] = true;
+    } else {
+        $error = "كلمة المرور غير صحيحة.";
+    }
+}
+
+// تسجيل الخروج من الخزنة
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: " . strtok($_SERVER["REQUEST_URI"], '?'));
+    exit;
+}
+?>
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>نظام الرسائل الآمن</title>
+<style>
+  body { font-family: Arial, sans-serif; direction: rtl; padding: 30px; }
+  .container { max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px; }
+  textarea { width: 100%; height: 80px; margin-bottom: 10px; }
+  .vault-form { float: left; }
+  .status { color: green; }
+  .error { color: red; }
+  pre { background: #eee; padding: 10px; max-height: 300px; overflow: auto; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h2>📩 أرسل لي رسالة</h2>
+  
+  <?php if (isset($status)) echo "<p class='status'>$status</p>"; ?>
+
+  <form method="post">
+    <textarea name="message" placeholder="اكتب رسالتك هنا..." required></textarea><br>
+    <button type="submit">إرسال</button>
+  </form>
+
+  <hr>
+
+  <div style="overflow: hidden;">
+    <form method="post" class="vault-form">
+      <input type="password" name="vault_password" placeholder="ادخل كلمة السر للخزنة" required>
+      <button type="submit">دخول</button>
+    </form>
+  </div>
+
+  <?php if (isset($error)) echo "<p class='error'>$error</p>"; ?>
+
+  <?php if (isset($_SESSION['vault_access']) && $_SESSION['vault_access']): ?>
+    <h3>🗄️ محتوى الخزنة</h3>
+    <pre>
+<?php
+if (file_exists($storage_file)) {
+    echo htmlspecialchars(file_get_contents($storage_file));
+} else {
+    echo "لا توجد رسائل مخزنة.";
+}
+?>
+    </pre>
+    <a href="?logout=1">تسجيل خروج من الخزنة</a>
+  <?php endif; ?>
+
+</div>
+
+</body>
+</html>
